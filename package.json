@@ -1,0 +1,28 @@
+{
+  "name": "barcode-scanner",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "jquery": "^2.2.2"
+  },
+  "devDependencies": {
+    "electron": "^0.4.1",
+    "electron-builder": "^3.1.0",
+    "electron-packager": "^5.2.1",
+    "electron-prebuilt": "^0.37.2"
+  },
+  "build": {
+    "app-bundle-id": "barcode-scanner",
+    "app-category-type": "commercial"
+  },
+  "scripts": {
+    "start": "electron .",
+    "package": "electron-packager . \"Barcode Scanner X\" --platform=win32 --arch=ia32",
+    "pack": "build",
+    "dist": "build",
+    "postinstall": "install-app-deps"
+  },
+  "author": "Anirudh Balaji",
+  "license": "ISC"
+}
