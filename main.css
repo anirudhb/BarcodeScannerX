@@ -21,7 +21,11 @@ body {
 
 .wrapper {
   padding: 8px;
-  text-align: center;
+}
+
+.right {
+  float: right;
+  text-align: right;
 }
 
 div.menu {
@@ -80,6 +84,7 @@ ul.items > li.item {
   text-transform: uppercase;
   font-style: italic;
   letter-spacing: 0.1em;
+  text-align: left;
 }
 
 ul.items {
@@ -97,4 +102,17 @@ ul.items {
 ul.items > li.item > span.price {
   float: right;
   letter-spacing: 1px;
+  display: inline;
+}
+
+ul.items > li.item > span.price > input {
+  font-style: italic;
+  padding: 5px;
+  padding-top: 0;
+}
+
+ul.items > li.item > .material-icons {
+  font-size: 18px;
+  font-style: italic;
+  display: inline;
 }
