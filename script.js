@@ -47,7 +47,7 @@ $(function() {
           if (data.items.length <= 0) {
             item.text("XXXXXXXXXX");
             price.text("0.00");
-            price.append(closer);
+            item.append(closer);
             item.append(price);
             $(".items").append(item);
             $(".barcode-input").val("");
