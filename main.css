@@ -107,8 +107,6 @@ ul.items > li.item > span.price {
 
 ul.items > li.item > span.price > input {
   font-style: italic;
-  padding: 5px;
-  padding-top: 0;
 }
 
 ul.items > li.item > .material-icons {
