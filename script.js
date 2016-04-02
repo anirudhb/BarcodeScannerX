@@ -58,7 +58,6 @@ $(function() {
             } else {
               price.text(data.items[0]["lowest_recorded_price"].toFixed(2).toString());
             }
-            closer.addClass("right");
             item.append(priceMod);
             item.append(closer);
             item.append(price);
