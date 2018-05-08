@@ -21,4 +21,4 @@ To run (dev server):
 bower install
 polymer serve
 ```
-The server will be at (localhost:8081)[http://localhost:8081].
+The server will be at [http://localhost:8081](localhost:8081).
