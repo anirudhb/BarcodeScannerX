@@ -1,0 +1,7 @@
+{
+  "name": "BarcodeScannerX",
+  "short_name": "BarcodeScannerX",
+  "description": "A barcode scanner with useful features, made cross-platform by Electron",
+  "start_url": "/",
+  "display": "standalone"
+}

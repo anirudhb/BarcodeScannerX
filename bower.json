@@ -1,0 +1,17 @@
+{
+  "name": "BarcodeScannerX",
+  "description": "A barcode scanner with useful features, made cross-platform by Electron",
+  "main": "index.html",
+  "dependencies": {
+    "polymer": "Polymer/polymer#^2.0.0",
+    "app-layout": "^2.1.0",
+    "paper-icon-button": "^2.2.0",
+    "iron-icons": "^2.1.1",
+    "iron-selector": "^2.1.0",
+    "paper-item": "^2.1.1"
+  },
+  "devDependencies": {
+    "web-component-tester": "Polymer/web-component-tester#^6.0.0",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^1.0.0"
+  }
+}

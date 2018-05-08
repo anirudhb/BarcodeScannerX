@@ -1,0 +1,154 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html" />
+
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html" />
+<link rel="import" href="../bower_components/iron-image/iron-image.html" />
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html" />
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html" />
+<link rel="import" href="../bower_components/paper-item/paper-item.html" />
+<link rel="import" href="../bower_components/paper-item/paper-item-body.html" />
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html" />
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html" />
+<link rel="import" href="../bower_components/paper-input/paper-input.html" />
+<link rel="import" href="../bower_components/paper-button/paper-button.html" />
+<link rel="import" href="../bower_components/paper-spinner/paper-spinner.html" />
+
+<dom-module id="bsx-items">
+  <template>
+    <style is="custom-style">
+      .filler {
+        padding-top: 7000px;
+      }
+
+      .floating-toolbar {
+        position: fixed;
+        right: 0;
+        top: 64px;
+        padding: 10px;
+        z-index: 200;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .floating-toolbar > * {
+        display: inline-block;
+      }
+
+      #dialog_image {
+        width: 100px;
+        height: 100px;
+      }
+    </style>
+    <div class="floating-toolbar">
+      <paper-fab icon="add" mini on-click="openAddDialog"></paper-fab>
+      <paper-item>
+        <paper-item-body two-line>
+          <div secondary>Total</div>
+          <div>$[[total(items)]]</div>
+        </paper-item-body>
+      </paper-item>
+    </div>
+
+    <paper-dialog id="addDialog">
+      <h2>Add item</h2>
+      <!-- Note: UPC barcodes are 12 digits long -->
+      <!-- type=tel used to workaround spinner on desktop -->
+      <div>
+        <paper-input label="Barcode" on-keyup="processBarcodeValue" value="{{barcodeValue}}" type="tel" char-counter maxlength="12"></paper-input>
+        <paper-spinner active id="adddialog_spinner"></paper-spinner>
+        <iron-ajax auto url="https://api.upcitemdb.com/prod/trial/lookup" last-response="{{response}}" handle-as="json" params="[[createParams(barcodeValue)]]" debounce-duration="200"></iron-ajax>
+        <iron-image sizing="contain" prevent-load preload hidden id="dialog_image" on-loaded-changed="_adddialog_hidespinner_and_show_image" src="[[getFirstImage(response)]]">
+        </iron-image>
+      </div>
+    </paper-dialog>
+
+    <template is="dom-repeat" items="[[items]]">
+      <paper-item>
+        <paper-item-body two-line>
+          <div>[[item.name]]</div>
+          <div secondary>$[[to_price(item.price)]]</div>
+        </paper-item-body>
+      </paper-item>
+    </template>
+
+    <div class="filler"></div>
+  </template>
+  <script>
+    class BsxItems extends Polymer.Element {
+      static get is() { return "bsx-items"; }
+      static get properties() {
+        return {
+          items: {
+            type: Array,
+            value: [],
+          },
+          barcodeValue: String,
+          response: Object,
+        }
+      }
+
+      to_price(price) {
+        return price.toFixed(2);
+      }
+
+      total(items) {
+        return this.to_price(items.map((x)=>x.price).reduce((a,v)=>a+v, 0));
+      }
+
+      constructor() {
+        super();
+      }
+
+      openAddDialog() {
+        addDialog.open();
+        dialog_image.preventLoad = false;
+      }
+
+      addItem() {
+        this.push("items", {
+          name: this.response.items[0].title,
+          // Figure out the lowest available price
+          price: Math.min(...(this.response.items[0].offers.map((x) => parseFloat(x.price, 10)))),
+        });
+        this.notifyPath("items");
+      }
+
+      createParams(barcode) {
+        return {
+          upc: barcode
+        };
+      }
+
+      getFirstImage(resp) {
+        return resp.items[0].images[0];
+      }
+
+      processBarcodeValue(e) {
+        if (e.key == "Enter") {
+          e.preventDefault();
+          this.addItem(this.barcodeValue);
+          this._dismissDialog();
+        }
+      }
+
+      _dismissDialog() {
+        this.barcodeValue = "";
+        dialog_image.hidden = true;
+        adddialog_spinner.active = true;
+        adddialog_spinner.hidden = false;
+        dialog_image.preventLoad = true;
+      }
+
+      _adddialog_hidespinner_and_show_image() {
+        if (dialog_image.loaded) {
+          adddialog_spinner.active = false;
+          adddialog_spinner.hidden = true;
+          dialog_image.hidden = false;
+        }
+      }
+
+    }
+    
+    customElements.define(BsxItems.is, BsxItems);
+  </script>
+</dom-module>
