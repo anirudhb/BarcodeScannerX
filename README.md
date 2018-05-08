@@ -4,10 +4,10 @@ _Note: This is the rewrite with Polymer. See 1.x for old, finished application._
 A rewrite of BarcodeScannerX updated with new features, new UI and new functionality.
 
 ## New functionaliy
-- [] Switchable command 'views'
+- [ ] Switchable command 'views'
 - [x] Web browser support
-- [] Caching
-- [] External datasource
+- [ ] Caching
+- [ ] External datasource
 
 ## Building & Running
 To build:
