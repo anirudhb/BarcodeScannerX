@@ -10,7 +10,7 @@
     <paper-item>
       <paper-item-body two-line>
         <div>[[selected_offer.title]]</div>
-        <div secondary>$[[selected_offer.price]]</div>
+        <div secondary>$[[toPrice(selected_offer.price)]]</div>
       </paper-item-body>
       <paper-dropdown-menu id="menu" label="Merchant" on-iron-select="changeSelectedOffer">
         <paper-listbox slot="dropdown-content" class="dropdown-content" selected="0">
@@ -32,6 +32,10 @@
             observer: "_firePriceChange",
           }
         };
+      }
+
+      toPrice(x) {
+        return parseInt(x, 10) == x ? x : x.toFixed(2);
       }
 
       changeSelectedOffer(e, detail) {
