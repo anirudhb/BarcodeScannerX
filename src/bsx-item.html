@@ -1,0 +1,58 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html" />
+
+<link rel="import" href="../bower_components/paper-item/paper-item.html" />
+<link rel="import" href="../bower_components/paper-item/paper-item-body.html" />
+<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html" />
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html" />
+
+<dom-module id="bsx-item">
+  <template>
+    <paper-item>
+      <paper-item-body two-line>
+        <div>[[selected_offer.title]]</div>
+        <div secondary>$[[selected_offer.price]]</div>
+      </paper-item-body>
+      <paper-dropdown-menu id="menu" label="Merchant" on-iron-select="changeSelectedOffer">
+        <paper-listbox slot="dropdown-content" class="dropdown-content" selected="0">
+          <template is="dom-repeat" id="repeatOffers" items="[[item.offers]]">
+            <paper-item>[[capitalize(item.merchant)]]</paper-item>
+          </template>
+        </paper-listbox>
+      </paper-dropdown-menu>
+    </paper-item>
+  </template>
+  <script>
+    class BsxItem extends Polymer.Element {
+      static get is() { return "bsx-item"; }
+      static get properties() {
+        return {
+          item: Object,
+          selected_offer: {
+            type: Object,
+            observer: "_firePriceChange",
+          }
+        };
+      }
+
+      changeSelectedOffer(e, detail) {
+        // Change offer
+        let item = this.$.repeatOffers.itemForElement(detail.item);
+        this.set("selected_offer", item);
+      }
+
+      connectedCallback() {
+        this.set("selected_offer", this.item.offers[0]);
+      }
+
+      _firePriceChange(new_, old) {
+	      this.dispatchEvent(new CustomEvent("price-changed", {detail: {oldPrice: (old || {price: 0}).price, newPrice: (new_ || {price: 0}).price}}));
+      }
+
+      capitalize(x) {
+        return x.charAt(0).toUpperCase() + x.slice(1);
+      }
+    }
+
+    customElements.define(BsxItem.is, BsxItem);
+  </script>
+</dom-module>

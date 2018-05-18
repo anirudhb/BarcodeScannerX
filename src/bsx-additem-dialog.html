@@ -1,0 +1,107 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html" />
+
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html" />
+<link rel="import" href="../bower_components/paper-input/paper-input.html" />
+<link rel="import" href="../bower_components/paper-spinner/paper-spinner.html" />
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html" />
+<link rel="import" href="../bower_components/iron-image/iron-image.html" />
+
+<dom-module id="bsx-additem-dialog">
+  <template>
+    <paper-dialog id="addDialog">
+      <h2>Add item</h2>
+      <paper-input label="Barcode" id="in" on-keyup="processBarcodeValue" value="{{barcodeValue}}" type="tel" char-counter maxlength="12"></paper-input>
+      <paper-spinner active id="adddialog_spinner"></paper-spinner>
+      <!--<iron-ajax id="ajax" url="[[createUrl(barcodeValue)]]" last-response="{{response}}" handle-as="json" debounce-duration="200"></iron-ajax> -->
+      <iron-image prevent-load hidden id="dialog_image" on-loaded-changed="_show_image" src="[[getFirstImage(response)]]" crossorigin="anonymous"></iron-image>
+    </paper-dialog>
+  </template>
+  <script>
+    class BsxAddItemDialogElement extends Polymer.Element {
+      static get is() { return "bsx-additem-dialog"; }
+      static get properties() {
+        return {
+          barcodeValue: String,
+          response: {
+            type: Object,
+            observer: "_logResp"
+          }
+        };
+      }
+
+      processBarcodeValue(e) {
+        if (this.$["in"].value.length == 12) {
+          // Send request
+          this._fetch();
+        }
+        if (e.key == "Enter") {
+          e.preventDefault();
+          this._fireAddItem();
+          // Reset values
+          this.$.dialog_image.hidden = true;
+          this.$.adddialog_spinner.active = true;
+          this.$.adddialog_spinner.hidden = false;
+          this.$.dialog_image.preventLoad = true;
+          this.$["in"].value = "";
+          this.dismiss();
+        }
+      }
+
+      getFirstImage(r) {
+	      return r.items[0].images[0];
+      }
+
+      _logResp(new_, old) {
+        console.log("Changed from:");
+        console.log(old);
+        console.log("To:");
+        console.log(new_);
+      }
+
+      _fireAddItem() {
+        // Get item
+        let item = this.response.items[0];
+        this.dispatchEvent(new CustomEvent("add-item", {
+          detail: {item}
+        }));
+      }
+
+      createUrl(upc) {
+        return "https://cors-anywhere.herokuapp.com/"+("https://api.upcitemdb.com/prod/trial/lookup?upc="+upc);
+      }
+
+      _fetch() {
+        fetch(this.createUrl(this.barcodeValue)).then(x => x.json())
+          .then((v) => {
+            this.set("response", v);
+            this._logResp(v, null);
+            console.log(v);
+          });
+      }
+
+      _show_image() {
+        if (this.$.dialog_image.loaded) {
+          this.$.adddialog_spinner.active = false;
+          this.$.adddialog_spinner.hidden = true;
+          this.$.dialog_image.hidden = false;
+        }
+      }
+
+      dismiss() {
+        this.$.addDialog.close();
+        this.$.ajax.url = "";
+      }
+
+      close() {
+        this.$.addDialog.close();
+        this.$.ajax.url = "";
+      }
+
+      open() {
+        this.$.addDialog.open();
+      }
+    }
+
+    customElements.define(BsxAddItemDialogElement.is, BsxAddItemDialogElement);
+  </script>
+</dom-module>

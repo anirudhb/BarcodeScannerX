@@ -1,16 +1,20 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html" />
 
+<link rel="import" href="bsx-item.html" />
+<link rel="import" href="bsx-additem-dialog.html" />
+
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html" />
 <link rel="import" href="../bower_components/iron-image/iron-image.html" />
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html" />
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html" />
 <link rel="import" href="../bower_components/paper-item/paper-item.html" />
 <link rel="import" href="../bower_components/paper-item/paper-item-body.html" />
-<link rel="import" href="../bower_components/paper-fab/paper-fab.html" />
 <link rel="import" href="../bower_components/paper-dialog/paper-dialog.html" />
 <link rel="import" href="../bower_components/paper-input/paper-input.html" />
 <link rel="import" href="../bower_components/paper-button/paper-button.html" />
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html" />
 <link rel="import" href="../bower_components/paper-spinner/paper-spinner.html" />
+<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html" />
 
 <dom-module id="bsx-items">
   <template>
@@ -22,12 +26,16 @@
       .floating-toolbar {
         position: fixed;
         right: 0;
-        top: 64px;
+        top: 128px;
         padding: 10px;
         z-index: 200;
         display: flex;
         justify-content: center;
         align-items: center;
+      }
+
+      .main-content {
+        min-height: calc(100vh - 128px);
       }
 
       .floating-toolbar > * {
@@ -39,39 +47,23 @@
         height: 100px;
       }
     </style>
-    <div class="floating-toolbar">
-      <paper-fab icon="add" mini on-click="openAddDialog"></paper-fab>
+
+    <bsx-additem-dialog id="addDialog" on-add-item="addItem"></bsx-additem-dialog>
+    <div class="main-content">
+      <template is="dom-repeat" items="[[items]]">
+        <bsx-item item="[[item]]" on-price-changed="_recalculateTotal"></bsx-item>
+      </template>
+    </div>
+
+    <app-toolbar>
+      <paper-icon-button icon="add" on-click="openAddDialog"></paper-icon-button>
       <paper-item>
         <paper-item-body two-line>
           <div secondary>Total</div>
-          <div>$[[total(items)]]</div>
+          <div>$[[total]]</div>
         </paper-item-body>
       </paper-item>
-    </div>
-
-    <paper-dialog id="addDialog">
-      <h2>Add item</h2>
-      <!-- Note: UPC barcodes are 12 digits long -->
-      <!-- type=tel used to workaround spinner on desktop -->
-      <div>
-        <paper-input label="Barcode" on-keyup="processBarcodeValue" value="{{barcodeValue}}" type="tel" char-counter maxlength="12"></paper-input>
-        <paper-spinner active id="adddialog_spinner"></paper-spinner>
-        <iron-ajax auto url="https://api.upcitemdb.com/prod/trial/lookup" last-response="{{response}}" handle-as="json" params="[[createParams(barcodeValue)]]" debounce-duration="200"></iron-ajax>
-        <iron-image sizing="contain" prevent-load preload hidden id="dialog_image" on-loaded-changed="_adddialog_hidespinner_and_show_image" src="[[getFirstImage(response)]]">
-        </iron-image>
-      </div>
-    </paper-dialog>
-
-    <template is="dom-repeat" items="[[items]]">
-      <paper-item>
-        <paper-item-body two-line>
-          <div>[[item.name]]</div>
-          <div secondary>$[[to_price(item.price)]]</div>
-        </paper-item-body>
-      </paper-item>
-    </template>
-
-    <div class="filler"></div>
+    </app-toolbar>
   </template>
   <script>
     class BsxItems extends Polymer.Element {
@@ -81,22 +73,19 @@
           items: {
             type: Array,
             value: [],
+            notify: true,
           },
-          barcodeValue: String,
-          response: Object,
+          total: {
+            type: Number,
+            value: 0
+          }
         }
       }
 
       to_price(price) {
+        if (parseInt(price.toString(), 10) == price)
+          return price;
         return price.toFixed(2);
-      }
-
-      total(items) {
-        return this.to_price(items.map((x)=>x.price).reduce((a,v)=>a+v, 0));
-      }
-
-      constructor() {
-        super();
       }
 
       openAddDialog() {
@@ -104,13 +93,14 @@
         dialog_image.preventLoad = false;
       }
 
-      addItem() {
-        this.push("items", {
-          name: this.response.items[0].title,
-          // Figure out the lowest available price
-          price: Math.min(...(this.response.items[0].offers.map((x) => parseFloat(x.price, 10)))),
-        });
-        this.notifyPath("items");
+      addItem(item) {
+        this.push("items", item.detail.item);
+      }
+
+      _recalculateTotal(e) {
+        console.log("Price changed!");
+	this.total -= e.detail.oldPrice;
+	this.total += e.detail.newPrice;
       }
 
       createParams(barcode) {

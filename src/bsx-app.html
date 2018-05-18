@@ -60,8 +60,8 @@
         </app-header>
 
         <iron-pages selected="[[selected_page]]" attr-for-selected="name">
-          <bsx-items name="items" items="{{items}}"></bsx-items>
-          <bsx-actions name="actions" items="[[items]]"></bsx-actions>
+          <bsx-items name="items"></bsx-items>
+          <bsx-actions name="actions"></bsx-actions>
         </iron-pages>
       </app-header-layout>
     </app-drawer-layout>
@@ -76,18 +76,6 @@
       static get is() { return 'bsx-app'; }
       static get properties() {
         return {
-          items: {
-            type: Array,
-            value() {
-              return [{
-                name: "Clorox Bleach",
-                price: 53.45
-              }, {
-                name: "Sandisk Flash Drive 8GB",
-                price: 10.99
-              }]
-            }
-          },
           selected_page: {
             type: String,
             value: "items"
