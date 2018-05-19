@@ -10,7 +10,7 @@
   <template>
     <paper-dialog id="addDialog">
       <h2>Add item</h2>
-      <paper-input label="Barcode" id="in" on-keyup="processBarcodeValue" value="{{barcodeValue}}" type="tel" char-counter maxlength="12"></paper-input>
+      <paper-input label="Barcode" id="in" on-keyup="processBarcodeValue" value="{{barcodeValue}}" type="tel" char-counter></paper-input>
       <paper-spinner active id="adddialog_spinner"></paper-spinner>
       <!--<iron-ajax id="ajax" url="[[createUrl(barcodeValue)]]" last-response="{{response}}" handle-as="json" debounce-duration="200"></iron-ajax> -->
       <iron-image prevent-load hidden id="dialog_image" on-loaded-changed="_show_image" src="[[getFirstImage(response)]]" crossorigin="anonymous"></iron-image>
@@ -30,11 +30,11 @@
       }
 
       processBarcodeValue(e) {
-        if (this.$["in"].value.length == 12) {
+        if (this.$["in"].value.length >= 12) {
           // Send request
           this._fetch();
         }
-        if (e.key == "Enter") {
+        if (e.key == "Enter" || e.key == "Return") {
           e.preventDefault();
           this._fireAddItem();
           // Reset values
