@@ -47,7 +47,6 @@
       <app-drawer slot="drawer">
         <iron-selector attr-for-selected="name" selected="{{selected_page}}">
           <paper-item name="items">Items</paper-item>
-          <paper-item name="actions">Actions<paper-item>
         </iron-selector>
       </app-drawer>
 
@@ -61,7 +60,6 @@
 
         <iron-pages selected="[[selected_page]]" attr-for-selected="name">
           <bsx-items name="items"></bsx-items>
-          <bsx-actions name="actions"></bsx-actions>
         </iron-pages>
       </app-header-layout>
     </app-drawer-layout>
